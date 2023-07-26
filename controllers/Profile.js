@@ -1,5 +1,8 @@
 const router = require('express').Router()
 const Profile = require('../models/Profile')
+const bcrypt = require('bcryptjs');
+const secret = 'wdibwehrbvwkbefhbwhefbhvwbefhbvh2efbjnvbwefjbv'
+const jwt = require('jsonwebtoken')
 
 
 
@@ -8,9 +11,11 @@ router.get('/', async (req, res) => {
   try {
       const people = await Profile.find()
       res.json(people)
+      
   } catch (error) {
       console.log('error retreiving profile:', error)
       res.json({ message: 'error retreving profile' })
+      
   }
 })
 
@@ -39,18 +44,22 @@ router.post('/', async (req, res) => {
 })
 
 router.post('/login', async (req, res) => {
-  const { emailAddress } = req.body;
-  console.log(emailAddress)
-  try {
-    const profile = await Profile.findOne({ emailAddress: `${emailAddress}` });
-    console.log('we are her', profile);
-    return res.json(profile);
-  } catch (error) {
-    console.log('error fetching profile', error);
-    res.json({ message: 'error fetching profile' });
-  }
-})
-
+    const { username, password} = req.body;
+    const profiles = await Profile.findOne({ username: `${username}`});;
+    const passOk = bcrypt.compareSync(password, profiles.password)
+    console.log(profiles)
+    if(passOk){
+      jwt.sign({username,id:profiles._id}, secret, {}, (err,token) => {
+          if(err) throw err;
+          
+          res.cookie('token', token).json('ok')
+          
+      })
+    }else{
+      res.status(400).json('Wrong Credentials')
+    }
+  })
+    
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -62,6 +71,7 @@ router.put('/:id', async (req, res) => {
     res.json({ message: 'error updating Profile' });
   }
 })
+
 
 router.delete('/:id', async (req, res) => {
   try {

@@ -28,16 +28,11 @@ const profileSchema = new mongoose.Schema(
     //   type: String,
     //   default: 'https://upload.wikimedia.org/wikipedia/commons/b/b5/Windows_10_Default_Profile_Picture.svg'
     // },
-    getsUpdates: {
-      type: Boolean,
-      default: false
-    },
     password: {
       type: String,
       required: true,
-      min: 8,
-      max: 16,
-      
+     
+
     }
    
 }, {
@@ -67,13 +62,15 @@ profileSchema.pre("save", function (next) {
   }
 })
 
-
+const secret = 'wdibwehrbvwkbefhbwhefbhvwbefhbvh2efbjnvbwefjbv'
 profileSchema.methods.comparePassword = function(password, callback) {
   bcrypt.compare(password, this.password, function(error, isMatch) {
-    if (error) {
-      return callback(error)
+    if (isMatch) {
+        jwt.sign({username,id:profileSchema._id}, secret, {}, (err,tokem))
+            if(err) throw err;
+            res.json(token)
     } else {
-      callback(null, isMatch)
+      callback(null, error)
     }
   })
 }
