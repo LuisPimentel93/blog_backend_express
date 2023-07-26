@@ -8,15 +8,47 @@ const jwt = require('jsonwebtoken')
 
 
 router.get('/', async (req, res) => {
-  try {
-      const people = await Profile.find()
-      res.json(people)
-      
-  } catch (error) {
-      console.log('error retreiving profile:', error)
-      res.json({ message: 'error retreving profile' })
-      
-  }
+    try {
+        const people = await Profile.find()
+        res.json(people)
+        
+    } catch (error) {
+        console.log('error retreiving profile:', error)
+        res.json({ message: 'error retreving profile' })
+        
+    }
+})
+
+router.get('/profile', (req,res) =>{
+    const { token } = req.cookies
+    jwt.verify(token, secret, {}, (err, info) => {
+        if(err) throw err
+        res.json(info)
+    } )
+})
+router.post('/login', async (req, res) => {
+    const { username, password} = req.body;
+    const profiles = await Profile.findOne({ username: `${username}`});;
+    const passOk = bcrypt.compareSync(password, profiles.password)
+    console.log(profiles)
+    if(passOk){
+      jwt.sign({username,id:profiles._id}, secret, {}, (err,token) => {
+          if(err) throw err;
+          
+          res.cookie('token', token).json({
+            id: profiles._id,
+            username,
+            password
+          })
+          
+      })
+    }else{
+      res.status(400).json('Wrong Credentials')
+    }
+  })
+
+router.post('/logout', (req, res) =>{
+    res.cookie('token', '').json('ok')
 })
 
 router.get('/:id', async (req, res) => {
@@ -43,22 +75,6 @@ router.post('/', async (req, res) => {
   
 })
 
-router.post('/login', async (req, res) => {
-    const { username, password} = req.body;
-    const profiles = await Profile.findOne({ username: `${username}`});;
-    const passOk = bcrypt.compareSync(password, profiles.password)
-    console.log(profiles)
-    if(passOk){
-      jwt.sign({username,id:profiles._id}, secret, {}, (err,token) => {
-          if(err) throw err;
-          
-          res.cookie('token', token).json('ok')
-          
-      })
-    }else{
-      res.status(400).json('Wrong Credentials')
-    }
-  })
     
 router.put('/:id', async (req, res) => {
   try {

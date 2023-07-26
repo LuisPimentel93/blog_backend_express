@@ -24,10 +24,6 @@ const profileSchema = new mongoose.Schema(
       required: true,
       unique: true
     },
-    // profilePicture: {
-    //   type: String,
-    //   default: 'https://upload.wikimedia.org/wikipedia/commons/b/b5/Windows_10_Default_Profile_Picture.svg'
-    // },
     password: {
       type: String,
       required: true,

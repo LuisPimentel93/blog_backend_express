@@ -4,8 +4,8 @@ const cors = require('cors')
 const app = express()
 require('dotenv').config()
 const cookieParser = require('cookie-parser')
-const jwt = require('jsonwebtoken')
-const secret = 'wdibwehrbvwkbefhbwhefbhvwbefhbvh2efbjnvbwefjbv'
+// const jwt = require('jsonwebtoken')
+// const secret = 'wdibwehrbvwkbefhbwhefbhvwbefhbvh2efbjnvbwefjbv'
 
 
 const profileControllers = require('./controllers/Profile')
@@ -17,17 +17,6 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 
 app.use('/profiles', profileControllers)
-
-app.get('/profile', (req,res) =>{
-    const { token } = req.cookies
-          jwt.verify(token, secret, {}, (err, info) => {
-            if(err) throw err
-            res.json(info)
-          } )
-})
-
-
-
 
 // db connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
