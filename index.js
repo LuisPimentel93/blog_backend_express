@@ -4,6 +4,7 @@ const cors = require('cors')
 const app = express()
 require('dotenv').config()
 const cookieParser = require('cookie-parser')
+
 // const jwt = require('jsonwebtoken')
 // const secret = 'wdibwehrbvwkbefhbwhefbhvwbefhbvh2efbjnvbwefjbv'
 
@@ -15,6 +16,7 @@ app.use(cors({credentials:true,origin:'http://localhost:3000'}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
+
 
 app.use('/profiles', profileControllers)
 

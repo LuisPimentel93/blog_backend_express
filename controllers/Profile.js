@@ -3,6 +3,8 @@ const Profile = require('../models/Profile')
 const bcrypt = require('bcryptjs');
 const secret = 'wdibwehrbvwkbefhbwhefbhvwbefhbvh2efbjnvbwefjbv'
 const jwt = require('jsonwebtoken')
+const multer = require('multer')
+const uploadMiddleware = multer({dest: './uploads'})
 
 
 
@@ -19,6 +21,17 @@ router.get('/', async (req, res) => {
     }
 })
 
+// router.get('/:id', async (req, res) => {
+//   const { id } = req.params
+//   try {
+//       const profile = await Profile.findById(id)
+//       res.json(profile)
+
+//   } catch (error) {
+//       console.log('error retreiving profile:', error)
+//       res.status(404).json({ message: `error retreiving profile with id ${id}` })
+//   }
+// })
 router.get('/profile', (req,res) =>{
     const { token } = req.cookies
     jwt.verify(token, secret, {}, (err, info) => {
@@ -51,17 +64,6 @@ router.post('/logout', (req, res) =>{
     res.cookie('token', '').json('ok')
 })
 
-router.get('/:id', async (req, res) => {
-  const { id } = req.params
-  try {
-      const profile = await Profile.findById(id)
-      res.json(profile)
-
-  } catch (error) {
-      console.log('error retreiving profile:', error)
-      res.status(404).json({ message: `error retreiving profile with id ${id}` })
-  }
-})
 
 router.post('/', async (req, res) => {
   try {
@@ -73,6 +75,10 @@ router.post('/', async (req, res) => {
       res.status(500).json({ message: 'error creating profile' })
   }
   
+})
+
+router.post('/post', uploadMiddleware.single('file'), (req,res) =>{
+    res.json({files:req.file})
 })
 
     
