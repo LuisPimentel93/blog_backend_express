@@ -1,11 +1,12 @@
 const router = require('express').Router()
 const Profile = require('../models/Profile')
+const Post = require('../models/Post')
 const bcrypt = require('bcryptjs');
 const secret = 'wdibwehrbvwkbefhbwhefbhvwbefhbvh2efbjnvbwefjbv'
 const jwt = require('jsonwebtoken')
 const multer = require('multer')
 const uploadMiddleware = multer({dest: './uploads'})
-
+const fs = require('fs')
 
 
 
@@ -77,8 +78,20 @@ router.post('/', async (req, res) => {
   
 })
 
-router.post('/post', uploadMiddleware.single('file'), (req,res) =>{
-    res.json({files:req.file})
+router.post('/post', uploadMiddleware.single('file'), async (req,res) =>{
+    const { originalname, path }= req.file;
+    const parts = originalname.split('.')
+    const ext = parts[parts.length - 1]
+    const newPath = path+'.'+ext
+    fs.renameSync(path, newPath)
+    const {title, summary, content} = req.body
+    const postDoc = await Post.create({
+        title,
+        summary,
+        content,
+        file:newPath,
+    })
+    res.json(postDoc)
 })
 
     

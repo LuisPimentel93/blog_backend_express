@@ -20,6 +20,7 @@ app.use(cookieParser())
 
 app.use('/profiles', profileControllers)
 
+
 // db connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('DB connected'))
